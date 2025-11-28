@@ -18,7 +18,6 @@ export function CatalogLayout() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: products = [], isLoading: loadingProducts } = useProducts();
-
   const { data: categories = [], isLoading: loadingCategories } = useCategories();
 
   const filteredProducts = useMemo(() => {
@@ -46,25 +45,32 @@ export function CatalogLayout() {
 
   if (loadingProducts || loadingCategories) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <Skeleton className="h-8 w-48" />
+      <div className="container mx-auto px-4 py-10">
+        <div className="flex items-center justify-between mb-8">
+          <Skeleton className="h-8 w-64" />
           <Skeleton className="h-10 w-32" />
         </div>
-        <Skeleton className="h-12 w-full mb-6" />
-        <div className="flex gap-2 mb-6">
-          <Skeleton className="h-8 w-20" />
-          <Skeleton className="h-8 w-24" />
-          <Skeleton className="h-8 w-28" />
+
+        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <Skeleton className="h-10 w-full md:w-80" />
+          <div className="flex gap-2">
+            <Skeleton className="h-9 w-24" />
+            <Skeleton className="h-9 w-24" />
+            <Skeleton className="h-9 w-24" />
+          </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {[...Array(8)].map((_, i) => (
-            <div key={i} className="border rounded-lg p-4">
-              <Skeleton className="aspect-square mb-4" />
-              <Skeleton className="h-6 w-3/4 mb-2" />
-              <Skeleton className="h-4 w-full mb-2" />
-              <Skeleton className="h-4 w-1/2 mb-3" />
-              <Skeleton className="h-8 w-24 mb-3" />
+            <div
+              key={i}
+              className="rounded-xl border bg-card p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+            >
+              <Skeleton className="mb-4 aspect-square rounded-lg" />
+              <Skeleton className="mb-2 h-6 w-3/4" />
+              <Skeleton className="mb-2 h-4 w-full" />
+              <Skeleton className="mb-3 h-4 w-1/2" />
+              <Skeleton className="mb-3 h-8 w-24" />
               <Skeleton className="h-10 w-full" />
             </div>
           ))}
@@ -74,44 +80,72 @@ export function CatalogLayout() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Catálogo de Produtos</h1>
+    <div className="container mx-auto px-4 py-10">
+      {/* Header */}
+      <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Catálogo de Produtos
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Explore os produtos disponíveis e adicione ao carrinho em poucos cliques.
+          </p>
+        </div>
+
         <Button
           onClick={() => navigate("/cart")}
           variant="outline"
-          className="relative"
+          className="relative flex items-center gap-2 rounded-full border-muted-foreground/20 px-4 shadow-sm hover:border-emerald-500 hover:bg-emerald-50"
         >
-          <ShoppingCart className="w-5 h-5 mr-2" />
-          Carrinho
+          <ShoppingCart className="h-5 w-5" />
+          <span>Carrinho</span>
           {cartItemCount > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+            <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-xs font-bold text-white shadow">
               {cartItemCount}
             </span>
           )}
         </Button>
       </div>
 
-      <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+      {/* Filtros */}
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+        <CategoryFilter
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+        />
+      </div>
 
-      <CategoryFilter
-        categories={categories}
-        selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
-      />
-
+      {/* Resultado */}
       {filteredProducts.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">
-            Nenhum produto encontrado com os filtros selecionados.
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed bg-muted/30 py-16 text-center">
+          <p className="mb-2 text-lg font-medium text-muted-foreground">
+            Nenhum produto encontrado.
           </p>
+          <p className="mb-4 text-sm text-muted-foreground">
+            Tente remover alguns filtros ou buscar por outro termo.
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setSelectedCategory(null);
+              setSearchTerm("");
+            }}
+          >
+            Limpar filtros
+          </Button>
         </div>
       ) : (
         <>
-          <p className="text-sm text-gray-600 mb-4">
-            {filteredProducts.length} produto(s) encontrado(s)
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="mb-4 flex items-center justify-between text-sm text-muted-foreground">
+            <span>
+              {filteredProducts.length} produto(s) encontrado(s)
+            </span>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredProducts.map((product) => (
               <ProductCard
                 key={product.id}
@@ -125,5 +159,6 @@ export function CatalogLayout() {
     </div>
   );
 }
+
 
 

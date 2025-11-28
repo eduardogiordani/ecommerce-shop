@@ -15,14 +15,17 @@ export function ProductDetailPage() {
 
   const { data: product, isLoading } = useProduct(id!);
 
-  const handleAddToCart = () => {
-    if (product) {
-      addToCart(product, quantity);
-      toast.success(`${quantity}x ${product.name} adicionado ao carrinho!`);
-      setQuantity(1);
-    }
-  };
+//CARRINHO ########################################
+const handleAddToCart = () => {
+  if (product) {
+    addToCart(product, quantity);
+    toast.success(`${quantity}x ${product.name} adicionado ao carrinho!`);
+    setQuantity(1);
 
+    navigate("/cart");
+  }
+};
+//CARRINHO ########################################
   const incrementQuantity = () => setQuantity((prev) => prev + 1);
   const decrementQuantity = () => setQuantity((prev) => Math.max(1, prev - 1));
 
@@ -57,7 +60,6 @@ export function ProductDetailPage() {
       </div>
     );
   }
-
   return (
     <div className="container mx-auto px-4 py-8">
       <Button
